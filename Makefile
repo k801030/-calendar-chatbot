@@ -12,5 +12,5 @@ run:
 
 # deploy to GCP
 deploy:
-	mvn appengine:deploy -s pom.xml
+	mvn clean package appengine:deploy -s pom.xml
 

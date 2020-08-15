@@ -1,13 +1,12 @@
 package my.side.project.calendarchatbot.models;
 
 import com.google.cloud.Timestamp;
-import com.google.firebase.database.PropertyName;
 
 /**
  * the event model of firestore
  */
 public class Event {
-    @PropertyName("test")
+
     String title;
     String userId;
     Timestamp startTime;
@@ -15,12 +14,10 @@ public class Event {
     Object createdAt;
     Object updatedAt;
 
-    @PropertyName("userId")
     public String getTitle() {
         return title;
     }
 
-    @PropertyName("test")
     public Event setTitle(String title) {
         this.title = title;
         return this;

@@ -43,7 +43,7 @@ public class Demo {
                 .setUpdatedAt(FieldValue.serverTimestamp());
             String id = eventDataStore.create(event);
 
-            // query with order and limit
+            // query with order anㄒㄨㄠd limit
 
             event.setEndTime(twoDayLater);
             eventDataStore.create(event);

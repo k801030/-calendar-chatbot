@@ -18,3 +18,11 @@ gcloud app create
 gcloud config set project \
     calendar-286506
 ```
+
+
+## Sample Request
+
+```bash
+curl https://calendar-286506.an.r.appspot.com/events/2Eu9I8bGQGks5rXJ4jZZ | jq
+curl https://calendar-286506.an.r.appspot.com/events?userId=vison | jq
+```
