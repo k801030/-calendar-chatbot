@@ -13,11 +13,30 @@ public class Output {
     private static final String YELLOW = "\033[0;33m";  // YELLOW
     private static final String RED = "\033[0;31m";     // RED
 
+    private String name;
 
+    private Output(String name) {
+        this.name = name;
+    }
 
-    public static void print(LogLevel logLevel, String message) {
-        String output = String.format("%s  %s %s", getNow(), decoratedLogLevel(logLevel), message);
+    /**
+     * to create an output class
+     * @param name
+     * @return
+     */
+    public static Output getOutput(String name) {
+        return new Output(name);
+    }
+
+    public void print(LogLevel logLevel, String message) {
+        String output = String.format("%s  %s %s - %s", getNow(), decoratedLogLevel(logLevel), name, message);
         System.out.println(output);
+    }
+
+    public void print(LogLevel logLevel, String message, String... args) {
+        for (String arg : args)
+            message = message.replaceFirst("\\{\\}", arg);
+        print(logLevel, message);
     }
 
     /**
