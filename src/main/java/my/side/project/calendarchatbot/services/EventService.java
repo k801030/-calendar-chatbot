@@ -1,6 +1,5 @@
 package my.side.project.calendarchatbot.services;
 
-import com.google.cloud.Timestamp;
 import my.side.project.calendarchatbot.datastores.EventDataStore;
 import my.side.project.calendarchatbot.models.Event;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +27,8 @@ public class EventService {
     }
 
     public List<Event> queryByUserAndStartTime(@Nonnull String userId,
-                                        @Nonnull Timestamp startTime,
-                                        @Nonnull Integer limit) throws Exception {
+                                               @Nonnull String startTime,
+                                               @Nonnull Integer limit) throws Exception {
         return dataStore.queryByUserAndStartTime(userId, startTime, limit);
     }
 

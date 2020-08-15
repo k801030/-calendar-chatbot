@@ -1,10 +1,10 @@
 package my.side.project.calendarchatbot.datastores;
 
 import com.google.api.core.ApiFuture;
-import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.FieldValue;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
@@ -12,7 +12,9 @@ import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import my.side.project.calendarchatbot.modelmappers.Mapper;
 import my.side.project.calendarchatbot.models.Event;
+import my.side.project.calendarchatbot.models.EventDataObject;
 import my.side.project.calendarchatbot.utils.LogLevel;
 import my.side.project.calendarchatbot.utils.Output;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,14 +35,17 @@ public class EventFirestore implements EventDataStore {
     private static final String COLLECTION_NAME = "events";
 
     private Firestore db;
+    private Mapper mapper;
 
     @Autowired
     public EventFirestore() throws IOException {
         db = FirestoreFactory.create();
+        mapper = new Mapper();
     }
 
-    public EventFirestore(@Nonnull Firestore firestore) {
+    public EventFirestore(@Nonnull Firestore firestore, @Nonnull Mapper mapper) {
         this.db = firestore;
+        this.mapper = mapper;
     }
 
     @Override
@@ -49,7 +54,10 @@ public class EventFirestore implements EventDataStore {
         OUTPUT.print(LogLevel.DEBUG, "create a id={}", docRef.getId());
 
         // asynchronously write data
-        ApiFuture<WriteResult> future = docRef.set(event);
+        EventDataObject eventDataObject = mapper.toDataObject(event);
+        eventDataObject.setCreatedAt(FieldValue.serverTimestamp());
+        eventDataObject.setUpdatedAt(FieldValue.serverTimestamp());
+        ApiFuture<WriteResult> future = docRef.set(eventDataObject);
 
         // result.get() blocks on response
         try {
@@ -71,11 +79,11 @@ public class EventFirestore implements EventDataStore {
         try {
             DocumentSnapshot document = future.get();
             if (document.exists()) {
-                Event event = document.toObject(Event.class);
+                EventDataObject eventDataObject = document.toObject(EventDataObject.class);
                 OUTPUT.print(LogLevel.DEBUG, "Document data={}", document.getData().toString());
-                return event;
+                return mapper.toEntity(id, eventDataObject);
             } else {
-                OUTPUT.print(LogLevel.WARN, "No such document");
+                OUTPUT.print(LogLevel.WARN, "No such document, with id={}", id);
             }
         } catch (Exception e) {
             OUTPUT.print(LogLevel.ERROR, "Failed to get results, message={}", e.getMessage());
@@ -85,14 +93,14 @@ public class EventFirestore implements EventDataStore {
     }
 
     @Override
-    public List<Event> queryByUserAndStartTime(@Nonnull String userId, @Nonnull Timestamp startTime,
+    public List<Event> queryByUserAndStartTime(@Nonnull String userId, @Nonnull String startTime,
                                                @Nonnull Integer limit) throws IOException {
         // Create a reference to the events collection
-        CollectionReference events = db.collection(COLLECTION_NAME);
+        CollectionReference ref = db.collection(COLLECTION_NAME);
         // Create a query against the collection.
-        Query query = events
+        Query query = ref
             .whereEqualTo("userId", userId)
-            .whereGreaterThanOrEqualTo("startTime", startTime)
+            .whereGreaterThanOrEqualTo("startTime", mapper.toTimestamp(startTime))
             .orderBy("startTime")
             .orderBy("endTime")
             .limit(limit);
@@ -107,7 +115,10 @@ public class EventFirestore implements EventDataStore {
                 OUTPUT.print(LogLevel.DEBUG, document.getData().toString());
             }
             OUTPUT.print(LogLevel.DEBUG, "-----------");
-            return documents.stream().map(doc -> doc.toObject(Event.class)).collect(Collectors.toList());
+            return documents.stream().map(doc -> {
+                EventDataObject eventDataObject = doc.toObject(EventDataObject.class);
+                return mapper.toEntity(doc.getId(), eventDataObject);
+            }).collect(Collectors.toList());
         } catch (Exception e) {
             OUTPUT.print(LogLevel.ERROR, "Failed to query data, message={}", e.getMessage());
             throw new IOException("Failed to query data", e);
@@ -117,7 +128,10 @@ public class EventFirestore implements EventDataStore {
     @Override
     public void update(@Nonnull String id, @Nonnull Event event) throws IOException {
         DocumentReference docRef = db.collection(COLLECTION_NAME).document(id);
-        ApiFuture<WriteResult> future = docRef.update(toMap(event));
+        EventDataObject eventDataObject = mapper.toDataObject(event);
+        eventDataObject.setUpdatedAt(FieldValue.serverTimestamp());
+
+        ApiFuture<WriteResult> future = docRef.update(toMap(eventDataObject));
         try {
             WriteResult result = future.get();
             OUTPUT.print(LogLevel.DEBUG, "Succeed to update data, with updateTime={}",
@@ -143,10 +157,16 @@ public class EventFirestore implements EventDataStore {
         }
     }
 
-    private static Map<String, Object> toMap(Event event) {
-        String json = GSON.toJson(event);
-        Map<String, Object> result = new Gson().fromJson(json, Map.class);
-        return result;
+    private static Map<String, Object> toMap(EventDataObject eventDataObject) {
+        String json = GSON.toJson(eventDataObject);
+        Map<String, Object> map = new Gson().fromJson(json, Map.class);
+        if (eventDataObject.getStartTime() != null) {
+            map.put("startTime", eventDataObject.getStartTime());
+        }
+        if (eventDataObject.getEndTime() != null) {
+            map.put("endTime", eventDataObject.getEndTime());
+        }
+        return map;
     }
 
 }

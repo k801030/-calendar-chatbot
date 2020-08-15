@@ -2,15 +2,17 @@ package my.side.project.calendarchatbot;
 
 import static my.side.project.calendarchatbot.utils.LogLevel.INFO;
 
-import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.Firestore;
 import my.side.project.calendarchatbot.datastores.EventDataStore;
 import my.side.project.calendarchatbot.datastores.EventFirestore;
 import my.side.project.calendarchatbot.datastores.FirestoreFactory;
 import my.side.project.calendarchatbot.exceptions.EventNotFoundException;
+import my.side.project.calendarchatbot.modelmappers.Mapper;
 import my.side.project.calendarchatbot.models.Event;
 import my.side.project.calendarchatbot.services.EventService;
 import my.side.project.calendarchatbot.utils.Output;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,7 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
 import java.util.List;
 
 @SpringBootApplication
@@ -35,7 +36,7 @@ public class CalendarChatbotApplication {
         SpringApplication.run(CalendarChatbotApplication.class, args);
 
         Firestore db = FirestoreFactory.create();
-        EventDataStore eventDataStore = new EventFirestore(db);
+        EventDataStore eventDataStore = new EventFirestore(db, new Mapper());
     }
 
     @GetMapping("/")
@@ -46,9 +47,8 @@ public class CalendarChatbotApplication {
 
     @GetMapping("/events")
     public List<Event> queryEvents(@RequestParam(value = "userId", defaultValue = "") String userId) throws Exception {
-        Long now = new Date().getTime();
-        Timestamp start = Timestamp.ofTimeMicroseconds(now * 1000);
-        return eventService.queryByUserAndStartTime(userId, start, 5);
+        String now = DateTime.now().toString(ISODateTimeFormat.dateTime());
+        return eventService.queryByUserAndStartTime(userId, now, 5);
     }
 
     @GetMapping("/events/{id}")

@@ -1,18 +1,24 @@
 package my.side.project.calendarchatbot.models;
 
-import com.google.cloud.Timestamp;
-
 /**
  * the event model of firestore
  */
 public class Event {
 
+    String id;
     String title;
     String userId;
-    Timestamp startTime;
-    Timestamp endTime;
-    Object createdAt;
-    Object updatedAt;
+    String startTime;
+    String endTime;
+
+    public String getId() {
+        return id;
+    }
+
+    public Event setId(String id) {
+        this.id = id;
+        return this;
+    }
 
     public String getTitle() {
         return title;
@@ -32,39 +38,21 @@ public class Event {
         return this;
     }
 
-    public Timestamp getStartTime() {
+    public String getStartTime() {
         return startTime;
     }
 
-    public Event setStartTime(Timestamp startTime) {
+    public Event setStartTime(String startTime) {
         this.startTime = startTime;
         return this;
     }
 
-    public Timestamp getEndTime() {
+    public String getEndTime() {
         return endTime;
     }
 
-    public Event setEndTime(Timestamp endTime) {
+    public Event setEndTime(String endTime) {
         this.endTime = endTime;
-        return this;
-    }
-
-    public Object getCreatedAt() {
-        return createdAt;
-    }
-
-    public Event setCreatedAt(Object createdAt) {
-        this.createdAt = createdAt;
-        return this;
-    }
-
-    public Object getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public Event setUpdatedAt(Object updatedAt) {
-        this.updatedAt = updatedAt;
         return this;
     }
 }

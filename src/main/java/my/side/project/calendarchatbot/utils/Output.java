@@ -21,8 +21,6 @@ public class Output {
 
     /**
      * to create an output class
-     * @param name
-     * @return
      */
     public static Output getOutput(String name) {
         return new Output(name);
@@ -34,15 +32,17 @@ public class Output {
     }
 
     public void print(LogLevel logLevel, String message, String... args) {
-        for (String arg : args)
+        for (String arg : args) {
+            if (arg == null) {
+                arg = "";
+            }
             message = message.replaceFirst("\\{\\}", arg);
+        }
         print(logLevel, message);
     }
 
     /**
      * decorate the output for log level text
-     * @param logLevel
-     * @return
      */
     private static String decoratedLogLevel(LogLevel logLevel) {
         switch (logLevel) {
