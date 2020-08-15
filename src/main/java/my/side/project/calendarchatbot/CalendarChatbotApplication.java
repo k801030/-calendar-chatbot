@@ -10,18 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CalendarChatbotApplication {
 
-
-
-
 	public static void main(String[] args) {
 		SpringApplication.run(CalendarChatbotApplication.class, args);
 	}
 
-	@GetMapping("/hello")
-	public String hello(@RequestParam(value = "name", defaultValue = "guest") String name) {
+	@GetMapping("/")
+	public String hello(@RequestParam(value = "name", defaultValue = "world") String name) {
 		Output.print(LogLevel.INFO, name);
 		return String.format("Hello %s!", name);
 	}
-
-
 }
