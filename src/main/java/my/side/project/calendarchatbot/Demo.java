@@ -27,25 +27,27 @@ public class Demo {
             EventDataStore eventDataStore = new EventFirestore(db);
 
             Date date = new Date();
-            Long now = date.getTime();
-            Timestamp start = Timestamp.ofTimeMicroseconds(now * 1000);
-            Timestamp oneDayLater = Timestamp.ofTimeMicroseconds((now + 86400 * 1000) * 1000);
+            Long nowTs = date.getTime();
+            Timestamp now = Timestamp.ofTimeMicroseconds(nowTs * 1000);
+            Timestamp oneHourLater = Timestamp.ofTimeMicroseconds((nowTs + 3600 * 1000) * 1000);
+            Timestamp oneDayLater = Timestamp.ofTimeMicroseconds((nowTs + 86400 * 1000) * 1000);
+            Timestamp twoDayLater = Timestamp.ofTimeMicroseconds((nowTs + 2 * 86400 * 1000) * 1000);
 
             // create
             Event event = new Event()
                 .setTitle("A party")
                 .setUserId("vison")
-                .setStartTime(start)
+                .setStartTime(oneHourLater)
                 .setEndTime(oneDayLater)
                 .setCreatedAt(FieldValue.serverTimestamp())
                 .setUpdatedAt(FieldValue.serverTimestamp());
             String id = eventDataStore.create(event);
 
             // query with order and limit
-            Timestamp oneHourLater = Timestamp.ofTimeMicroseconds((now + 3600 * 1000) * 1000);
-            event.setEndTime(oneHourLater);
+
+            event.setEndTime(twoDayLater);
             eventDataStore.create(event);
-            eventDataStore.queryByUserAndStartTime("vison", start, 5);
+            eventDataStore.queryByUserAndStartTime("vison", now, 5);
 
             // get
             eventDataStore.get("404-id");

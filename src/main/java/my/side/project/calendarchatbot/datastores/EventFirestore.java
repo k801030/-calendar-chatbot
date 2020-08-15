@@ -15,6 +15,8 @@ import com.google.gson.GsonBuilder;
 import my.side.project.calendarchatbot.models.Event;
 import my.side.project.calendarchatbot.utils.LogLevel;
 import my.side.project.calendarchatbot.utils.Output;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,12 +25,19 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
+@Service
 public class EventFirestore implements EventDataStore {
 
     private static final Output OUTPUT = Output.getOutput(EventDataStore.class.getName());
     private static final Gson GSON = new GsonBuilder().create();
     private static final String COLLECTION_NAME = "events";
+
     private Firestore db;
+
+    @Autowired
+    public EventFirestore() throws IOException {
+        db = FirestoreFactory.create();
+    }
 
     public EventFirestore(@Nonnull Firestore firestore) {
         this.db = firestore;

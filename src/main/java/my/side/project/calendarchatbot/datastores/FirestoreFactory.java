@@ -7,6 +7,7 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import my.side.project.calendarchatbot.utils.LogLevel;
 import my.side.project.calendarchatbot.utils.Output;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,14 +19,25 @@ public class FirestoreFactory {
 
     public static Firestore create() throws IOException {
         String keyPath = System.getenv("KEY_PATH");
-        OUTPUT.print(LogLevel.DEBUG, "keyPath={}", keyPath);
-        InputStream serviceAccount = new FileInputStream(keyPath);
-        GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
+        GoogleCredentials credentials;
+
+        if (StringUtils.isEmpty(keyPath)) {
+            // it's in GCP env
+            credentials =  GoogleCredentials.getApplicationDefault();
+        } else {
+            // it's in local env
+            OUTPUT.print(LogLevel.DEBUG, "keyPath={}", keyPath);
+            InputStream serviceAccount = new FileInputStream(keyPath);
+            credentials = GoogleCredentials.fromStream(serviceAccount);
+        }
+
         FirebaseOptions options = new FirebaseOptions.Builder()
             .setCredentials(credentials)
             .build();
-        FirebaseApp.initializeApp(options);
 
+        if(FirebaseApp.getApps().isEmpty()) {
+            FirebaseApp.initializeApp(options);
+        }
         Firestore db = FirestoreClient.getFirestore();
         return db;
     }
