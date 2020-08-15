@@ -46,6 +46,13 @@
             <artifactId>spring-cloud-gcp-starter</artifactId>
             <version>1.0.0.RELEASE</version>
         </dependency>
+
+        <!-- firebase firestore -->
+        <dependency>
+            <groupId>com.google.firebase</groupId>
+            <artifactId>firebase-admin</artifactId>
+            <version>6.16.0</version>
+        </dependency>
     </dependencies>
 
     <build>

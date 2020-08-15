@@ -1,4 +1,4 @@
-package my.side.project.calendarchatbot;
+package my.side.project.calendarchatbot.utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
