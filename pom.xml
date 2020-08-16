@@ -61,10 +61,18 @@
             <version>2.3.8</version>
         </dependency>
 
+        <!-- convert datetime -->
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.10.6</version>
+        </dependency>
+
+        <!-- input stream to bytes -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.7</version>
         </dependency>
     </dependencies>
 

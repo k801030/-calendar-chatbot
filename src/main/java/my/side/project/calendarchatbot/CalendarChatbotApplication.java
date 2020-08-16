@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.List;
 
 @SpringBootApplication
@@ -57,5 +58,18 @@ public class CalendarChatbotApplication {
         if (event == null)
             throw new EventNotFoundException();
         return event;
+    }
+
+    @GetMapping("/.well-known/pki-validation/701CB0A61C9A3561C39C7913BA5C92DB.txt")
+    public String getImage() throws IOException {
+        // InputStream in = getClass()
+        //     .getResourceAsStream("701CB0A61C9A3561C39C7913BA5C92DB.txt");
+        // return IOUtils.toByteArray(in);
+        // File file = new ClassPathResource("701CB0A61C9A3561C39C7913BA5C92DB.txt").getFile();
+        // byte[] fileBytes = FileUtils.readFileToByteArray(file);
+        // return new ResponseEntity<>(fileBytes, HttpStatus.OK);
+        return "41B86993DA63142A7C391EC84A1F53EF7C1630A215D358B3B1B212DB92D293F1\n"
+               + "comodoca.com\n"
+               + "0b26d5ea4daf632";
     }
 }
